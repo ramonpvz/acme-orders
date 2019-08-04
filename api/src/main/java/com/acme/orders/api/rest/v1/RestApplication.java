@@ -1,5 +1,7 @@
 package com.acme.orders.api.rest.v1;
 
+import com.acme.orders.api.integrations.impl.CatalogueClientImpl;
+import com.acme.orders.api.integrations.impl.CustomersClientImpl;
 import com.acme.orders.api.models.OrderDAO;
 import com.acme.orders.api.models.db.OrderEntity;
 import com.acme.orders.api.models.db.OrderItemEntity;
@@ -15,6 +17,9 @@ import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 /**
  * Created by nomar on 8/14/18.
@@ -46,9 +51,14 @@ public class RestApplication extends Application<RestConfiguration> {
         environment.getObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         environment.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
+        //JAX-RX Client
+        Client client = ClientBuilder.newClient();
+
         OrderService orderService = new OrderServiceImpl(
                 new OrderDAO(hibernate.getSessionFactory(), environment.metrics()),
-                environment.metrics()
+                environment.metrics(),
+                new CustomersClientImpl(client, configuration.getCustomersUrl()),
+                new CatalogueClientImpl(configuration.getCatalogueUrl())
         );
 
         environment.jersey().register(new OrderResource(orderService));

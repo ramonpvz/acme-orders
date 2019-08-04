@@ -5,18 +5,8 @@ package com.acme.orders.api.services.exceptions;
  */
 public class GeneralServiceException extends RuntimeException {
 
-    private String resource;
-
-    public GeneralServiceException(String resource) {
-        this.resource = resource;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
+    public GeneralServiceException(Throwable cause) {
+        super(cause);
     }
 
 }
